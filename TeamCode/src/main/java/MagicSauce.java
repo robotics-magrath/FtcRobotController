@@ -1,13 +1,10 @@
-package org.firstinspires.ftc.teamcode;
+
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.robot.RobotState;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -17,7 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit
 import java.util.Locale;
 
 @TeleOp(name="Decode Teleop", group="Linear Opmode")
-public class DecodeTeleop extends LinearOpMode {
+public class MagicSauce extends LinearOpMode {
 
     GoBildaPinpointDriver odo;
 
@@ -51,8 +48,9 @@ public class DecodeTeleop extends LinearOpMode {
     private static final double CLAW_OPEN_POSITION = 0.3;
     private static final double CLAW_CLOSED_POSITION = 0.8;
 
-    private int targetOutput = 0;
-    private int targetInput = 0;
+    private int targetOutake = 0;
+    private int targetIntake = 0;
+    private int targetspindexer = 0;
     private int bumptimer = 0;
 
     private boolean clawOpen = true;
@@ -81,10 +79,11 @@ public class DecodeTeleop extends LinearOpMode {
         // --- Hardware Mapping ---
         DcMotor Leftbw = hardwareMap.dcMotor.get("Leftbw");
         DcMotor Rightbw = hardwareMap.dcMotor.get("Rightbw");
-        DcMotor Leftfw = hardwareMap.dcMotor.get("Leftfw");
         DcMotor Rightfw = hardwareMap.dcMotor.get("Rightfw");
-        DcMotor Input = hardwareMap.dcMotor.get("Input");
-        DcMotor Output = hardwareMap.dcMotor.get("Output");
+        DcMotor Leftfw = hardwareMap.dcMotor.get("Leftfw");
+        DcMotor spindexer = hardwareMap.dcMotor.get("spindexer");
+        DcMotor Intake = hardwareMap.dcMotor.get("Intake");
+        DcMotor Outake = hardwareMap.dcMotor.get("Outake");
 
 
         // --- Drive motor setup ---
@@ -92,16 +91,16 @@ public class DecodeTeleop extends LinearOpMode {
         Rightbw.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // --- Arm/Output setup ---
-        Input.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        Output.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Outake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        Input.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        Output.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        Intake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        Outake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        Input.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        Output.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Outake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        odo = hardwareMap.get(GoBildaPinpointDriver.class,"odo");
+        odo = hardwareMap.get(GoBildaPinpointDriver.class,"odowheels");
 
         /*
         Set the odometry pod positions relative to the point that the odometry computer tracks around.
@@ -217,7 +216,6 @@ public class DecodeTeleop extends LinearOpMode {
             telemetry.addData("Status", odo.getDeviceStatus());
 
             telemetry.addData("Pinpoint Frequency", odo.getFrequency()); //prints/gets the current refresh rate of the Pinpoint
-
             telemetry.addData("REV Hub Frequency: ", frequency); //prints the control system refresh rate
             telemetry.update();
 
@@ -236,15 +234,15 @@ public class DecodeTeleop extends LinearOpMode {
 
             // --- Manual arm control with d-pad ---
             if (gamepad2.dpad_up) {
-                targetOutput = 10;
+                targetOutake = 10;
 
             } else if (gamepad2.dpad_down) {
-                targetOutput = 0;
+                targetOutake = 0;
 
             } else if (gamepad2.dpad_left) {
-                targetInput = -10;
+                targetspindexer = -10;
             } else if (gamepad2.dpad_right) {
-                targetInput = 0;
+                targetspindexer = 0;
             }
 
             // --- Drive control ---
@@ -259,16 +257,24 @@ public class DecodeTeleop extends LinearOpMode {
             Rightfw.setPower((forward - strafe - turn) / denominator);
             Rightbw.setPower((forward + strafe - turn) / denominator);
 
-            // --- Arm/Output movement ---
-            Output.setPower(targetOutput);
-            Input.setPower(targetInput);
+            // --- Spindexer Control ---n
+            if (gamepad2.a)
+                targetspindexer = 10;
+            if (gamepad2.b)
+                 targetspindexer = 0;
+            else
+                targetspindexer = 0;
 
+            // --- Arm/Output movement ---
+            Outake.setPower(targetOutake);
+            Intake.setPower(targetIntake);
+            spindexer.setPower(targetspindexer);
             // --- Telemetry ---
             telemetry.addData("Status", "Running");
-            telemetry.addData("Output Target", targetOutput);
-            telemetry.addData("Output Pos", Output.getCurrentPosition());
-            telemetry.addData("Input Target", targetInput);
-            telemetry.addData("Input Pos", Input.getCurrentPosition());
+            telemetry.addData("Output Target", targetOutake);
+            telemetry.addData("Output Pos", Outake.getCurrentPosition());
+            telemetry.addData("Intake Target", targetIntake);
+            telemetry.addData("Intake Pos", Intake.getCurrentPosition());
             telemetry.addData("System Time (ms)", timer.getTime());
             telemetry.addData("Claw", clawOpen ? "Open" : "Closed");
             telemetry.update();

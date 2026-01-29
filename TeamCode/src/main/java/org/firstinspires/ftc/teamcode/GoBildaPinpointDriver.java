@@ -1,4 +1,4 @@
-/*   MIT License
+package org.firstinspires.ftc.teamcode;/*   MIT License
  *   Copyright (c) [2025] [Base 10 Assets, LLC]
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,7 +20,7 @@
  *   SOFTWARE.
  */
 
-package org.firstinspires.ftc.teamcode;
+
 
 import static com.qualcomm.robotcore.util.TypeConversion.byteArrayToInt;
 
