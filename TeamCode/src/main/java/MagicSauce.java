@@ -219,7 +219,7 @@ public class MagicSauce extends LinearOpMode {
             telemetry.addData("REV Hub Frequency: ", frequency); //prints the control system refresh rate
             telemetry.update();
 
-        }
+
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -229,7 +229,7 @@ public class MagicSauce extends LinearOpMode {
         Robott timer = new Robott();
         timer.start();
 
-        while (opModeIsActive()) {
+        
             timer.update();
 
             // --- Manual arm control with d-pad ---
@@ -240,9 +240,9 @@ public class MagicSauce extends LinearOpMode {
                 targetOutake = 0;
 
             } else if (gamepad2.dpad_left) {
-                targetspindexer = -10;
+                targetIntake = -10;
             } else if (gamepad2.dpad_right) {
-                targetspindexer = 0;
+                targetIntake = 0;
             }
 
             // --- Drive control ---
@@ -257,26 +257,24 @@ public class MagicSauce extends LinearOpMode {
             Rightfw.setPower((forward - strafe - turn) / denominator);
             Rightbw.setPower((forward + strafe - turn) / denominator);
 
-            // --- Spindexer Control ---n
-            if (gamepad2.a)
-                targetspindexer = 10;
-            if (gamepad2.b)
-                 targetspindexer = 0;
-            else
-                targetspindexer = 0;
+            // --- Spindexer Control ---
+            double spin = gamepad2.left_stick_x;
+
+            spindexer.setPower(spin);
 
             // --- Arm/Output movement ---
             Outake.setPower(targetOutake);
             Intake.setPower(targetIntake);
             spindexer.setPower(targetspindexer);
             // --- Telemetry ---
-            telemetry.addData("Status", "Running");
+
+            telemetry.addData("Status", "Running V1.0");
+            telemetry.addData("spin",  spin);
             telemetry.addData("Output Target", targetOutake);
             telemetry.addData("Output Pos", Outake.getCurrentPosition());
             telemetry.addData("Intake Target", targetIntake);
             telemetry.addData("Intake Pos", Intake.getCurrentPosition());
             telemetry.addData("System Time (ms)", timer.getTime());
-            telemetry.addData("Claw", clawOpen ? "Open" : "Closed");
             telemetry.update();
         }
     }
