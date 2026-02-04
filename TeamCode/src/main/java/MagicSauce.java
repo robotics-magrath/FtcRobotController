@@ -44,6 +44,8 @@ public class MagicSauce extends LinearOpMode {
     private static final int WRIST_POSITION_SAMPLE = 270;
     private static final int WRIST_POSITION_SPEC = 10;
 
+    private static final int SPINDEXER_POSITION_1 = 10;
+
     private static final double CLAW_POSITION_INIT = 0.9;
     private static final double CLAW_OPEN_POSITION = 0.3;
     private static final double CLAW_CLOSED_POSITION = 0.8;
@@ -89,6 +91,8 @@ public class MagicSauce extends LinearOpMode {
         // --- Drive motor setup ---
         Rightfw.setDirection(DcMotorSimple.Direction.REVERSE);
         Rightbw.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        spindexer.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         // --- Arm/Output setup ---
         Intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -230,6 +234,12 @@ public class MagicSauce extends LinearOpMode {
         timer.start();
 
         
+
+        if (gamepad2.a)
+
+
+        while (opModeIsActive()) {
+
             timer.update();
 
             // --- Manual arm control with d-pad ---
