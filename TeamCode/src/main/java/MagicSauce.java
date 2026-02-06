@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -44,7 +45,7 @@ public class MagicSauce extends LinearOpMode {
     private static final int WRIST_POSITION_SAMPLE = 270;
     private static final int WRIST_POSITION_SPEC = 10;
 
-    private static final int SPINDEXER_POSITION_1 = 10;
+    private static final int SPINDEXER_TICKS_PER_POSITION = 220;
 
     private static final double CLAW_POSITION_INIT = 0.9;
     private static final double CLAW_OPEN_POSITION = 0.3;
@@ -52,7 +53,8 @@ public class MagicSauce extends LinearOpMode {
 
     private int targetOutake = 0;
     private int targetIntake = 0;
-    private int targetspindexer = 0;
+    private int spinpos = 0;
+    private double spinoff = 0;
     private int bumptimer = 0;
 
     private boolean clawOpen = true;
@@ -92,8 +94,9 @@ public class MagicSauce extends LinearOpMode {
         Rightfw.setDirection(DcMotorSimple.Direction.REVERSE);
         Rightbw.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        spindexer.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         spindexer.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
+        spindexer.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         // --- Arm/Output setup ---
         Intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Outake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -235,10 +238,11 @@ public class MagicSauce extends LinearOpMode {
 
         
 
-        if (gamepad2.a)
+        if (gamepad2.x) {
+            spinpos = (spinpos +1) % 6;
+        }
 
 
-        while (opModeIsActive()) {
 
             timer.update();
 
@@ -268,18 +272,17 @@ public class MagicSauce extends LinearOpMode {
             Rightbw.setPower((forward + strafe - turn) / denominator);
 
             // --- Spindexer Control ---
-            double spin = gamepad2.left_stick_x;
+            spinoff = spinoff + gamepad2.left_stick_x;
 
-            spindexer.setPower(spin);
+            spindexer.setTargetPosition(spinpos * SPINDEXER_TICKS_PER_POSITION + (int) spinoff);
 
             // --- Arm/Output movement ---
             Outake.setPower(targetOutake);
             Intake.setPower(targetIntake);
-            spindexer.setPower(targetspindexer);
             // --- Telemetry ---
 
             telemetry.addData("Status", "Running V1.0");
-            telemetry.addData("spin",  spin);
+            telemetry.addData("spinpos",  spinpos);
             telemetry.addData("Output Target", targetOutake);
             telemetry.addData("Output Pos", Outake.getCurrentPosition());
             telemetry.addData("Intake Target", targetIntake);
