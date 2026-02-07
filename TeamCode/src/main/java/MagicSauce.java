@@ -45,7 +45,7 @@ public class MagicSauce extends LinearOpMode {
     private static final int WRIST_POSITION_SAMPLE = 270;
     private static final int WRIST_POSITION_SPEC = 10;
 
-    private static final int SPINDEXER_TICKS_PER_POSITION = 220;
+    private static final int SPINDEXER_TICKS_PER_POSITION = 80;
 
     private static final double CLAW_POSITION_INIT = 0.9;
     private static final double CLAW_OPEN_POSITION = 0.3;
@@ -55,9 +55,9 @@ public class MagicSauce extends LinearOpMode {
     private int targetIntake = 0;
     private int spinpos = 0;
     private double spinoff = 0;
-    private int bumptimer = 0;
+    private int spinWaitTime = 0;
 
-    private boolean clawOpen = true;
+    private boolean spinWait = false;
 
     // --- Helper class for timing
     class Robott {
@@ -94,9 +94,10 @@ public class MagicSauce extends LinearOpMode {
         Rightfw.setDirection(DcMotorSimple.Direction.REVERSE);
         Rightbw.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        spindexer.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         spindexer.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         spindexer.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        spindexer.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
         // --- Arm/Output setup ---
         Intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Outake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -236,13 +237,20 @@ public class MagicSauce extends LinearOpMode {
         Robott timer = new Robott();
         timer.start();
 
-        
-
+        //allows a wait before you can press the button again
         if (gamepad2.x) {
-            spinpos = (spinpos +1) % 6;
+            if (spinWait == true) {
+                spinpos = (spinpos + 1) ;
+                spinWaitTime = 30;
+               spinWait = false;
+            }
         }
 
-
+        if (spinWaitTime >= 0) {
+            spinWaitTime = spinWaitTime - 1;
+        } else {
+            spinWait = true;
+        }
 
             timer.update();
 
@@ -254,7 +262,7 @@ public class MagicSauce extends LinearOpMode {
                 targetOutake = 0;
 
             } else if (gamepad2.dpad_left) {
-                targetIntake = -10;
+                targetIntake = 10;
             } else if (gamepad2.dpad_right) {
                 targetIntake = 0;
             }
@@ -276,18 +284,13 @@ public class MagicSauce extends LinearOpMode {
 
             spindexer.setTargetPosition(spinpos * SPINDEXER_TICKS_PER_POSITION + (int) spinoff);
 
+                spindexer.setPower(0.5);
+
             // --- Arm/Output movement ---
             Outake.setPower(targetOutake);
             Intake.setPower(targetIntake);
             // --- Telemetry ---
-
-            telemetry.addData("Status", "Running V1.0");
-            telemetry.addData("spinpos",  spinpos);
-            telemetry.addData("Output Target", targetOutake);
-            telemetry.addData("Output Pos", Outake.getCurrentPosition());
-            telemetry.addData("Intake Target", targetIntake);
-            telemetry.addData("Intake Pos", Intake.getCurrentPosition());
-            telemetry.addData("System Time (ms)", timer.getTime());
+            telemetry.addData("spinpos",  spinpos * SPINDEXER_TICKS_PER_POSITION + (int) spinoff);
             telemetry.update();
         }
     }
