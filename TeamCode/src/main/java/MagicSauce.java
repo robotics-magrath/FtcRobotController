@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -47,9 +48,9 @@ public class MagicSauce extends LinearOpMode {
 
     private static final int SPINDEXER_TICKS_PER_POSITION = 85;
 
-    private static final double CLAW_POSITION_INIT = 0.9;
-    private static final double CLAW_OPEN_POSITION = 0.3;
-    private static final double CLAW_CLOSED_POSITION = 0.8;
+    private static final double flicker_POSITION_INIT = 0.9;
+    private static final double flicker_OPEN_POSITION = 0.3;
+    private static final double flicker_CLOSED_POSITION = 0.8;
 
     private int targetOutake = 0;
     private int targetIntake = 0;
@@ -60,6 +61,7 @@ public class MagicSauce extends LinearOpMode {
     private float Ycord = 0;
 
     private boolean spinWait = false;
+    private boolean lastBump = false;
 
     // --- Helper class for timing
     class Robott {
@@ -148,6 +150,8 @@ public class MagicSauce extends LinearOpMode {
         DcMotor Intake = hardwareMap.dcMotor.get("Intake");
         DcMotor Outake = hardwareMap.dcMotor.get("Outake");
 
+        Servo flicker = null;
+        flicker = hardwareMap.get(Servo.class, "flicker");
 
         // --- Drive motor setup ---
         Rightfw.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -166,7 +170,6 @@ public class MagicSauce extends LinearOpMode {
 
         Intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         Outake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
 
 
         /*
@@ -258,7 +261,7 @@ public class MagicSauce extends LinearOpMode {
         //allows a wait before you can press the button again
         if (gamepad2.x) {
             if (spinWait == true) {
-                spinpos = (spinpos + 2) ;
+                spinpos = (spinpos - 2) ;
                 spinWaitTime = 30;
                spinWait = false;
             }
@@ -269,6 +272,14 @@ public class MagicSauce extends LinearOpMode {
         } else {
             spinWait = true;
         }
+            if (gamepad2.right_bumper) {
+
+                flicker.setPosition(1);
+                } else {
+                flicker.setPosition(-1);
+            }
+
+
 
             timer.update();
 
@@ -309,6 +320,7 @@ public class MagicSauce extends LinearOpMode {
             Intake.setPower(targetIntake);
             // --- Telemetry ---
             telemetry.addData("spinpos",  spinpos * SPINDEXER_TICKS_PER_POSITION + (int) spinoff);
+            telemetry.addData("flicker",  flicker.getPosition());
             telemetry.update();
         }
     }

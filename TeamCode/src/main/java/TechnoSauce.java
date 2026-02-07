@@ -60,9 +60,27 @@ public class TechnoSauce extends LinearOpMode {
     private boolean spinWait = false;
 
     // --- Helper class for timing
-    class Robott {
+    static class Robott {
+        private enum TechnoState {
+        STATE,
+        MOVE,
+        SHOOT,
+        DELAY,
+        SPIN,
+            NEXT
+
+        }
+        private TechnoSauce.Robott.TechnoState myState;
+        private Robott.TechnoState currentState = TechnoState.NEXT;
+        public double autoForward = 0;
+        public double autoTurn = 0;
+        public double autoStrafe = 0;
+
+        int instruction = 0;
         long startTime;
         long currentTime;
+
+        long targetTime;
         double xoff;
         double yoff;
         GoBildaPinpointDriver odo;
@@ -117,11 +135,47 @@ public class TechnoSauce extends LinearOpMode {
         void update() {
             odo.update();
             currentTime = System.currentTimeMillis() - startTime;
+            switch(myState) {
+                case MOVE:
+                    autoForward = 1;
+                    if (currentTime > targetTime) {
+                        myState = TechnoState.NEXT;
+                        autoForward = 0;
+                    }
+                    break;
+                case SHOOT:
+                    autoForward = 1;
+                    break;
+                case DELAY:
+                    if (currentTime > targetTime)
+                        myState = TechnoState.NEXT;
+                    break;
+                case SPIN:
+                    autoForward = 1;
+                    break;
+                case NEXT:
+                    instructions();
+            }
+        }
+
+        void instructions() {
+            if( instruction == 0) {
+                targetTime = currentTime + 2000;
+                myState = TechnoState.DELAY;
+            }
+            if ( instruction == 1) {
+                targetTime = currentTime + 1000;
+                myState = TechnoState.MOVE;
+            }
+            instruction  += 1;
+
         }
 
         long getTime() {
             return currentTime;
         }
+
+
 
         String getPosition() {
             Pose2D pos = odo.getPosition();
@@ -284,9 +338,9 @@ public class TechnoSauce extends LinearOpMode {
             }
 
             // --- Drive control ---
-            double forward = -gamepad1.left_stick_y;
-            double strafe = gamepad1.right_stick_x;
-            double turn = gamepad1.left_stick_x;
+            double forward = timer.autoForward;
+            double strafe = timer.autoStrafe;
+            double turn = timer.autoTurn;
 
             double denominator = Math.max(Math.abs(forward) + Math.abs(strafe) + Math.abs(turn), 1);
 
