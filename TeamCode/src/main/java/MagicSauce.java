@@ -46,7 +46,7 @@ public class MagicSauce extends LinearOpMode {
     private static final int WRIST_POSITION_SAMPLE = 270;
     private static final int WRIST_POSITION_SPEC = 10;
 
-    private static final int SPINDEXER_TICKS_PER_POSITION = 85;
+    private static final int SPINDEXER_TICKS_PER_POSITION = 88;
 
     private static final double flicker_POSITION_INIT = 0.9;
     private static final double flicker_OPEN_POSITION = 0.3;
@@ -91,7 +91,7 @@ public class MagicSauce extends LinearOpMode {
         If you're using another kind of odometry pod, uncomment setEncoderResolution and input the
         number of ticks per unit of your odometry pod.
          */
-            odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+            odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD);
             //odo.setEncoderResolution(13.26291192, DistanceUnit.MM);
 
 
@@ -261,7 +261,7 @@ public class MagicSauce extends LinearOpMode {
         //allows a wait before you can press the button again
         if (gamepad2.x) {
             if (spinWait == true) {
-                spinpos = (spinpos - 2) ;
+                spinpos = (spinpos - 1) ;
                 spinWaitTime = 30;
                spinWait = false;
             }
@@ -303,9 +303,9 @@ public class MagicSauce extends LinearOpMode {
 
             double denominator = Math.max(Math.abs(forward) + Math.abs(strafe) + Math.abs(turn), 1);
 
-            Leftfw.setPower((forward - strafe + turn) / denominator);
+            Leftfw.setPower((forward + strafe - turn) / denominator);
             Leftbw.setPower((forward - strafe - turn) / denominator);
-            Rightfw.setPower((forward + strafe - turn) / denominator);
+            Rightfw.setPower((forward - strafe + turn) / denominator);
             Rightbw.setPower((forward + strafe + turn) / denominator);
 
             // --- Spindexer Control ---

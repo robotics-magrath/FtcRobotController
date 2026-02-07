@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -12,7 +13,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit
 
 import java.util.Locale;
 
-@TeleOp(name="Decode Teleop", group="Linear Opmode")
+@TeleOp(name="Decode Auto", group="Linear Opmode")
 public class TechnoSauce extends LinearOpMode {
 
 
@@ -66,28 +67,36 @@ public class TechnoSauce extends LinearOpMode {
         MOVE,
         SHOOT,
         DELAY,
-        SPIN,
-            NEXT
-
+        TURN,
+        FLICKER,
+        ODOSTOPLINE,
+        NEXT,
+        SHOOTSPIN,
+        SHOOTSPINDOWN,
+        
         }
-        private TechnoSauce.Robott.TechnoState myState;
+        private TechnoState myState = TechnoState.NEXT;
         private Robott.TechnoState currentState = TechnoState.NEXT;
         public double autoForward = 0;
         public double autoTurn = 0;
         public double autoStrafe = 0;
+        public int autoOutput = 0;
+        public int autoInput = 0;
+        public boolean autoFlick = false;
+        public int autoSpinBump = 0;
 
         int instruction = 0;
         long startTime;
         long currentTime;
 
         long targetTime;
-        double xoff;
-        double yoff;
+        double targetxoff;
+        double targetyoff;
         GoBildaPinpointDriver odo;
 
 
         void start(GoBildaPinpointDriver startodo) {
-
+            myState = TechnoState.NEXT;
             odo = startodo;
              /*
         Set the odometry pod positions relative to the point that the odometry computer tracks around.
@@ -105,7 +114,7 @@ public class TechnoSauce extends LinearOpMode {
         If you're using another kind of odometry pod, uncomment setEncoderResolution and input the
         number of ticks per unit of your odometry pod.
          */
-            odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+            odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD);
             //odo.setEncoderResolution(13.26291192, DistanceUnit.MM);
 
 
@@ -144,14 +153,44 @@ public class TechnoSauce extends LinearOpMode {
                     }
                     break;
                 case SHOOT:
-                    autoForward = 1;
+                    autoOutput = 1;
+                    autoFlick = true;
+
+                    if (currentTime > targetTime) {
+                        myState = TechnoState.SHOOTSPIN;
+                    }
+                    break;
+                case SHOOTSPIN:
+                    autoSpinBump= 2;
+                    myState = TechnoState.SHOOTSPINDOWN;
+                    targetTime = currentTime + 500;
+                    break;
+                case SHOOTSPINDOWN:
+                    autoSpinBump =0;
+                    if (currentTime > targetTime) {
+                        autoOutput = 0;
+                        autoFlick = false;
+                        myState = TechnoState.NEXT;
+                    }
                     break;
                 case DELAY:
-                    if (currentTime > targetTime)
+                    if (currentTime > targetTime) {
                         myState = TechnoState.NEXT;
+                    }
                     break;
-                case SPIN:
-                    autoForward = 1;
+                case TURN:
+                    autoTurn = 1;
+                    if (currentTime > targetTime) {
+                        myState = TechnoState.NEXT;
+                        autoTurn = 0;
+                    }
+                    break;
+                case ODOSTOPLINE:
+                    Pose2D pos = odo.getPosition();
+                   if (pos.getY(DistanceUnit.MM) >= targetyoff) {
+                       autoForward = 0;
+                       myState = TechnoState.NEXT;
+                   }
                     break;
                 case NEXT:
                     instructions();
@@ -164,9 +203,26 @@ public class TechnoSauce extends LinearOpMode {
                 myState = TechnoState.DELAY;
             }
             if ( instruction == 1) {
-                targetTime = currentTime + 1000;
+                targetTime = currentTime + 100;
                 myState = TechnoState.MOVE;
             }
+            if(instruction == 2) {
+                targetTime = currentTime + 50;
+                myState = TechnoState.TURN;
+            }
+            if(instruction == 3) {
+                myState = TechnoState.SHOOT;
+                targetTime = currentTime + 1000;
+            }
+            if(instruction == 4) {
+                myState = TechnoState.SHOOT;
+                targetTime = currentTime + 1000;
+            }
+            if(instruction == 5) {
+                myState = TechnoState.SHOOT;
+                targetTime = currentTime + 1000;
+            }
+
             instruction  += 1;
 
         }
@@ -199,6 +255,8 @@ public class TechnoSauce extends LinearOpMode {
         DcMotor spindexer = hardwareMap.dcMotor.get("spindexer");
         DcMotor Intake = hardwareMap.dcMotor.get("Intake");
         DcMotor Outake = hardwareMap.dcMotor.get("Outake");
+        Servo flicker = null;
+        flicker = hardwareMap.get(Servo.class, "flicker");
 
 
         // --- Drive motor setup ---
@@ -308,46 +366,36 @@ public class TechnoSauce extends LinearOpMode {
 
 
             //allows a wait before you can press the button again
-            if (gamepad2.x) {
-                if (spinWait == true) {
-                    spinpos = (spinpos + 2) ;
-                    spinWaitTime = 30;
-                    spinWait = false;
-                }
-            }
+            
+            spinpos = (spinpos + timer.autoSpinBump) ;
+                    
 
-            if (spinWaitTime >= 0) {
-                spinWaitTime = spinWaitTime - 1;
-            } else {
-                spinWait = true;
-            }
-
+           
             timer.update();
 
             // --- Manual arm control with d-pad ---
-            if (gamepad2.dpad_up) {
-                targetOutake = 10;
+           targetOutake = timer.autoOutput;
 
-            } else if (gamepad2.dpad_down) {
-                targetOutake = 0;
-
-            } else if (gamepad2.dpad_left) {
-                targetIntake = 10;
-            } else if (gamepad2.dpad_right) {
-                targetIntake = 0;
-            }
+            targetIntake = timer.autoInput;
 
             // --- Drive control ---
             double forward = timer.autoForward;
             double strafe = timer.autoStrafe;
             double turn = timer.autoTurn;
+            boolean flick = timer.autoFlick;
 
             double denominator = Math.max(Math.abs(forward) + Math.abs(strafe) + Math.abs(turn), 1);
 
-            Leftfw.setPower((forward - strafe + turn) / denominator);
-            Leftbw.setPower((forward - strafe - turn) / denominator);
-            Rightfw.setPower((forward + strafe - turn) / denominator);
-            Rightbw.setPower((forward + strafe + turn) / denominator);
+            Leftfw.setPower((forward + strafe + turn) / denominator);
+            Leftbw.setPower((forward - strafe + turn) / denominator);
+            Rightfw.setPower((forward - strafe - turn) / denominator);
+            Rightbw.setPower((forward + strafe - turn) / denominator);
+            if (flick) {
+
+                flicker.setPosition(1);
+            } else {
+                flicker.setPosition(-1);
+            }
 
             // --- Spindexer Control ---
             spinoff = spinoff + gamepad2.left_stick_x;
