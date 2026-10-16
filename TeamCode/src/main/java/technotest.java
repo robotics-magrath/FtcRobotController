@@ -57,6 +57,13 @@ public class technotest extends LinearOpMode {
     private int spinWaitTime = 0;
     private double Xcord = 0;
     private double Ycord = 0;
+    private double Dcord = 0;
+    private double Order = 0;
+    private double Xps = 0;
+    private double Yps = 0;
+    private double Dps = 0;
+    private double Distance =0;
+
 
     private boolean spinWait = false;
 
@@ -208,7 +215,7 @@ public class technotest extends LinearOpMode {
 
         String getPositionString() {
             Pose2D pos = odo.getPosition();
-            return String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}", pos.getX(DistanceUnit.CM), pos.getY(DistanceUnit.CM), pos.getHeading(AngleUnit.DEGREES));
+            return String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}", pos.getX(DistanceUnit.CM), pos.getY(DistanceUnit.CM), pos.getHeading(AngleUnit.RADIANS));
 
         }
 
@@ -224,6 +231,10 @@ public class technotest extends LinearOpMode {
         Double getYcoord() {
             Pose2D pos = odo.getPosition();
             return pos.getY(DistanceUnit.CM);
+        }
+        Double getOrientation() {
+            Pose2D pos = odo.getPosition();
+            return pos.getHeading(AngleUnit.RADIANS);
         }
 
 
@@ -304,34 +315,49 @@ public class technotest extends LinearOpMode {
              */
             Xcord = timer.getXcoord();
             Ycord = timer.getYcoord();
+            Dcord = timer.getOrientation();
             telemetry.addData("Position", timer.getPositionString());
 
             /*
             gets the current Velocity (x & y in mm/sec and heading in degrees/sec) and prints it.
              */
             telemetry.addData("Velocity", timer.getVelocityString());
+            double Xdif = (Xps - Xcord);
+            double Ydif = (Yps - Ycord);
 
-            double Xps = 0;
-            double Yps = 0;
+            Distance = (Math.sqrt((Math.pow((Xdif),2)) + (Math.pow((Ydif),2))));
+
+            Dps = Math.atan2(Xdif, Ydif);
+
+
 
             if (Math.abs(Xps - Xcord) < 20) {
+                timer.autoForward = 0.1;
+            } else if (Xps == Xcord) {
                 timer.autoForward = 0;
-            } else  {
-                timer.autoForward = 0.5;
+            } else {
+                timer.autoForward = 0;
             }
             if (Math.abs(Yps - Ycord) < 20 ) {
+                timer.autoStrafe = 0.1;
+            } else if (Yps == Ycord) {
                 timer.autoStrafe = 0;
             } else {
-                timer.autoStrafe = 0.5;
+                timer.autoStrafe = 0;
             }
 
-
+            if (Xcord == Xps && Ycord == Yps) {
+                Order =+ 1;
+            }
 
 
 
             waitForStart();
-            Xps = 100;
-            
+            Xps = 0;
+
+            if (Order == 1) {
+                Yps = 100;
+            }
 
             //allows a wait before you can press the button again
 
