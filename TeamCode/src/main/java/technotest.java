@@ -1,3 +1,4 @@
+import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -10,8 +11,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
+import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 @TeleOp(name="Decode odo", group="Linear Opmode")
 public class technotest extends LinearOpMode {
@@ -49,7 +52,7 @@ public class technotest extends LinearOpMode {
     private static final double CLAW_POSITION_INIT = 0.9;
     private static final double CLAW_OPEN_POSITION = 0.3;
     private static final double CLAW_CLOSED_POSITION = 0.8;
-
+    private HuskyLens huskyLens;
     private int targetOutake = 0;
     private int targetIntake = 0;
     private int spinpos = 0;
@@ -63,7 +66,7 @@ public class technotest extends LinearOpMode {
     private double Yps = 0;
     private double Dps = 0;
     private double Distance =0;
-
+    private final int READ_PERIOD = 1;
 
     private boolean spinWait = false;
 
@@ -247,13 +250,13 @@ public class technotest extends LinearOpMode {
         DcMotor Rightbw = hardwareMap.dcMotor.get("Rightbw");
         DcMotor Rightfw = hardwareMap.dcMotor.get("Rightfw");
         DcMotor Leftfw = hardwareMap.dcMotor.get("Leftfw");
-
+        huskyLens = hardwareMap.get(HuskyLens.class, "huskylens");
 
 
         // --- Drive motor setup ---
         Rightfw.setDirection(DcMotorSimple.Direction.REVERSE);
         Rightbw.setDirection(DcMotorSimple.Direction.REVERSE);
-
+        Deadline rateLimit = new Deadline(READ_PERIOD, TimeUnit.SECONDS);
 
 
 
