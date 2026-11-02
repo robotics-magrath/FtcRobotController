@@ -325,33 +325,60 @@ public class technotest extends LinearOpMode {
             gets the current Velocity (x & y in mm/sec and heading in degrees/sec) and prints it.
              */
             telemetry.addData("Velocity", timer.getVelocityString());
+            double Dswipswap = 0;
             double Xdif = (Xps - Xcord);
             double Ydif = (Yps - Ycord);
 
             Distance = (Math.sqrt((Math.pow((Xdif),2)) + (Math.pow((Ydif),2))));
 
             Dps = Math.atan2(Xdif, Ydif);
+            if (Dps < -0.02) {
+                Dswipswap = 1;
+            }
+            else if (Dps > 0.01){
+                Dswipswap = 0;
+            } else {
+                Dswipswap = 2;
+            }
 
+            if (Dswipswap == 0) {
+                 if (Dps == Dcord) {
+                    timer.autoTurn = 0;
+                } else {
+                    timer.autoTurn = 0.1;
+                }
+            } else if (Dswipswap == 1) {
+                 if (Dps == Dcord) {
+                    timer.autoTurn = 0;
+                } else {
+                    timer.autoTurn = -0.1;
+                }
+            }
 
+            if (Distance >= 20 && Dps == Dcord) {
+                timer.autoForward = 0.3;
+            } else if (Distance <= -20 && Dps == Dcord) {
+                timer.autoForward = -0.3;
+            }
 
-            if (Math.abs(Xps - Xcord) < 20) {
+              /*  if (Math.abs(Xps - Xcord) < 20) {
                 timer.autoForward = 0.1;
-            } else if (Xps == Xcord) {
+                } else if (Xps == Xcord) {
                 timer.autoForward = 0;
-            } else {
+                } else {
                 timer.autoForward = 0;
-            }
-            if (Math.abs(Yps - Ycord) < 20 ) {
+                 }
+                if (Math.abs(Yps - Ycord) < 20 ) {
                 timer.autoStrafe = 0.1;
-            } else if (Yps == Ycord) {
+                } else if (Yps == Ycord) {
                 timer.autoStrafe = 0;
-            } else {
+                 } else {
                 timer.autoStrafe = 0;
-            }
+             }*/
 
-            if (Xcord == Xps && Ycord == Yps) {
+                if (Xcord == Xps && Ycord == Yps) {
                 Order =+ 1;
-            }
+                }
 
 
 
