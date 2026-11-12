@@ -66,6 +66,8 @@ public class technotest extends LinearOpMode {
     private double Yps = 0;
     private double Dps = 0;
     private double Distance =0;
+
+    private double Point = 0;
     private final int READ_PERIOD = 1;
 
     private boolean spinWait = false;
@@ -344,20 +346,26 @@ public class technotest extends LinearOpMode {
             if (Dswipswap == 0) {
                  if (Dps == Dcord) {
                     timer.autoTurn = 0;
+                    Point = 1;
                 } else {
                     timer.autoTurn = 0.1;
+                    Point = 0;
                 }
             } else if (Dswipswap == 1) {
                  if (Dps == Dcord) {
                     timer.autoTurn = 0;
+                    Point = 1;
                 } else {
                     timer.autoTurn = -0.1;
+                     Point = 0;
                 }
+            } else if (Dswipswap == 2) {
+                Point = 1;
             }
 
-            if (Distance >= 20 && Dps == Dcord) {
+            if ((Distance >= 20) && (Point == 1)) {
                 timer.autoForward = 0.3;
-            } else if (Distance <= -20 && Dps == Dcord) {
+            } else if ((Distance <= -20) && (Point == 1)) {
                 timer.autoForward = -0.3;
             }
 
