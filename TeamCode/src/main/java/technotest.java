@@ -442,6 +442,7 @@ public class technotest extends LinearOpMode {
                 Yps = 100;
             }
 
+            
             //allows a wait before you can press the button again
 
             spinpos = (spinpos + timer.autoSpinBump) ;
