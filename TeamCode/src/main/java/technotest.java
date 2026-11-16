@@ -13,6 +13,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 
+import java.math.MathContext;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -33,7 +34,7 @@ public class technotest extends LinearOpMode {
         MANUAL
     }
 
-    private RobotState currentState = RobotState.INIT;
+    private final RobotState currentState = RobotState.INIT;
 
     // Arm and wrist target positions for each state
     private static final int ARM_POSITION_INTAKE = 450;
@@ -56,8 +57,8 @@ public class technotest extends LinearOpMode {
     private int targetOutake = 0;
     private int targetIntake = 0;
     private int spinpos = 0;
-    private double spinoff = 0;
-    private int spinWaitTime = 0;
+    private final double spinoff = 0;
+    private final int spinWaitTime = 0;
     private double Xcord = 0;
     private double Ycord = 0;
     private double Dcord = 0;
@@ -66,9 +67,11 @@ public class technotest extends LinearOpMode {
     private double Yps = 0;
     private double Dps = 0;
     private double Distance =0;
+    private double Dswipswap = 0;
+    private double point = 0;
     private final int READ_PERIOD = 1;
 
-    private boolean spinWait = false;
+    private final boolean spinWait = false;
 
     // --- Helper class for timing
     static class Robott {
@@ -86,7 +89,7 @@ public class technotest extends LinearOpMode {
 
         }
         private TechnoState myState = TechnoState.NEXT;
-        private Robott.TechnoState currentState = TechnoState.NEXT;
+        private final Robott.TechnoState currentState = TechnoState.NEXT;
         public double autoForward = 0;
         public double autoTurn = 0;
         public double autoStrafe = 0;
@@ -325,59 +328,58 @@ public class technotest extends LinearOpMode {
             gets the current Velocity (x & y in mm/sec and heading in degrees/sec) and prints it.
              */
             telemetry.addData("Velocity", timer.getVelocityString());
-            double Dswipswap = 0;
+
+
+
+
+
             double Xdif = (Xps - Xcord);
             double Ydif = (Yps - Ycord);
 
             Distance = (Math.sqrt((Math.pow((Xdif),2)) + (Math.pow((Ydif),2))));
 
             Dps = Math.atan2(Xdif, Ydif);
-            if (Dps < -0.02) {
+            if (Dps < -0.1) {
                 Dswipswap = 1;
             }
-            else if (Dps > 0.01){
+            else if (Dps > 0.1){
                 Dswipswap = 0;
             } else {
                 Dswipswap = 2;
             }
 
             if (Dswipswap == 0) {
+                timer.update();
                  if (Dps == Dcord) {
                     timer.autoTurn = 0;
+                    point = 1;
                 } else {
-                    timer.autoTurn = 0.1;
+                    timer.autoTurn = 0.3;
+                    point = 0;
                 }
             } else if (Dswipswap == 1) {
+                timer.update();
                  if (Dps == Dcord) {
                     timer.autoTurn = 0;
+                    point = 1;
                 } else {
-                    timer.autoTurn = -0.1;
+                    timer.autoTurn = -0.3;
+                    point = 0;
                 }
+            } else {
+                point = 1;
             }
 
-            if (Distance >= 20 && Dps == Dcord) {
+            if (Distance >= 20 && point == 1) {
                 timer.autoForward = 0.3;
-            } else if (Distance <= -20 && Dps == Dcord) {
+            } else if (Distance <= -20 && point == 1) {
                 timer.autoForward = -0.3;
             }
 
-              /*  if (Math.abs(Xps - Xcord) < 20) {
-                timer.autoForward = 0.1;
-                } else if (Xps == Xcord) {
-                timer.autoForward = 0;
-                } else {
-                timer.autoForward = 0;
-                 }
-                if (Math.abs(Yps - Ycord) < 20 ) {
-                timer.autoStrafe = 0.1;
-                } else if (Yps == Ycord) {
-                timer.autoStrafe = 0;
-                 } else {
-                timer.autoStrafe = 0;
-             }*/
+
 
                 if (Xcord == Xps && Ycord == Yps) {
-                Order =+ 1;
+                Order += 1;
                 }
 
 

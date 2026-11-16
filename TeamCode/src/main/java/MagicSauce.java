@@ -16,7 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit
 import java.util.Locale;
 
 @TeleOp(name="Decode Teleop", group="Linear Opmode")
-public class MagicSauce extends LinearOpMode {
+public class  MagicSauce extends LinearOpMode {
 
 
 
@@ -298,22 +298,22 @@ public class MagicSauce extends LinearOpMode {
 
             // --- Drive control ---
             double forward = -gamepad1.left_stick_y;
-            double strafe = gamepad1.right_stick_x;
-            double turn = gamepad1.left_stick_x;
+            double strafe = -gamepad1.left_stick_x;
+            double turn = gamepad1.right_stick_x;
 
             double denominator = Math.max(Math.abs(forward) + Math.abs(strafe) + Math.abs(turn), 1);
 
-            Leftfw.setPower((forward + strafe - turn) / denominator);
-            Leftbw.setPower((forward - strafe - turn) / denominator);
-            Rightfw.setPower((forward - strafe + turn) / denominator);
-            Rightbw.setPower((forward + strafe + turn) / denominator);
+            Leftfw.setPower((forward + strafe - turn/1.75) / denominator);
+            Leftbw.setPower((forward - strafe - turn/1.75) / denominator);
+            Rightfw.setPower((forward - strafe + turn/1.75) / denominator);
+            Rightbw.setPower((forward + strafe + turn/1.75) / denominator);
 
             // --- Spindexer Control ---
             spinoff = spinoff + gamepad2.left_stick_x;
 
             spindexer.setTargetPosition(spinpos * SPINDEXER_TICKS_PER_POSITION + (int) spinoff);
 
-                spindexer.setPower(0.75);
+                spindexer.setPower(1);
 
             // --- Arm/Output movement ---
             Outake.setPower(targetOutake);

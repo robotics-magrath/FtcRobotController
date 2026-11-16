@@ -99,7 +99,8 @@ public class TechnoSauce extends LinearOpMode {
             myState = TechnoState.NEXT;
             odo = startodo;
              /*
-        Set the odometry pod positions relative to the point that the odometry computer tracks around.
+        Set the odometry pod positions relative to the point that
+         the odometry computer tracks around.
         The X pod offset refers to how far sideways from the tracking point the
         X (forward) odometry pod is. Left of the center is a positive number,
         right of center is a negative number. the Y pod offset refers to how far forwards from
@@ -324,6 +325,7 @@ public class TechnoSauce extends LinearOpMode {
             of time each cycle takes and finds the frequency (number of updates per second) from
             that cycle time.
              */
+
             double newTime = getRuntime();
             double loopTime = newTime-oldTime;
             double frequency = 1/loopTime;
@@ -359,8 +361,7 @@ public class TechnoSauce extends LinearOpMode {
             */
 
 
-            telemetry.addData("Status", "Initialized");
-            telemetry.update();
+
 
             waitForStart();
 
@@ -408,7 +409,7 @@ public class TechnoSauce extends LinearOpMode {
             Outake.setPower(targetOutake);
             Intake.setPower(targetIntake);
             // --- Telemetry ---
-            telemetry.addData("spinpos",  spinpos * SPINDEXER_TICKS_PER_POSITION + (int) spinoff);
+            
             telemetry.update();
         }
     }
