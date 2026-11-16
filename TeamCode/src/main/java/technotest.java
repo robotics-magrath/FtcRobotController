@@ -69,6 +69,7 @@ public class technotest extends LinearOpMode {
     private double Distance =0;
     private double Dswipswap = 0;
     private double point = 0;
+
     private final int READ_PERIOD = 1;
 
     private final boolean spinWait = false;
@@ -211,8 +212,6 @@ public class technotest extends LinearOpMode {
             }
         }
 
-
-
         long getTime() {
             return currentTime;
         }
@@ -253,9 +252,9 @@ public class technotest extends LinearOpMode {
         DcMotor Rightbw = hardwareMap.dcMotor.get("Rightbw");
         DcMotor Rightfw = hardwareMap.dcMotor.get("Rightfw");
         DcMotor Leftfw = hardwareMap.dcMotor.get("Leftfw");
+        // Husky Hardware Mapping
         huskyLens = hardwareMap.get(HuskyLens.class, "huskylens");
-
-
+        huskyLens.selectAlgorithm(HuskyLens.Algorithm.TAG_RECOGNITION);
         // --- Drive motor setup ---
         Rightfw.setDirection(DcMotorSimple.Direction.REVERSE);
         Rightbw.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -314,8 +313,55 @@ public class technotest extends LinearOpMode {
             double loopTime = newTime-oldTime;
             double frequency = 1/loopTime;
             oldTime = newTime;
+            //Huskylens
+            HuskyLens.Block[] blocks = huskyLens.blocks();
 
+            if (blocks.length > 0) {
+                // Grab the first detected tag
+                int tagId = blocks[0].id;
+                int xCenter = blocks[0].x;
+                int width = blocks[0].width;
 
+                telemetry.addData("Tag ID", tagId);
+                telemetry.addData("X Position", xCenter);
+
+                if (tagId == 1) {
+                    Leftbw.setPower(1);
+                    Rightbw.setPower(1);
+                    Leftfw.setPower(1);
+                    Rightfw.setPower(1);
+                } else if (tagId == 2) {
+
+                } else if (tagId == 3) {
+
+                } else if (tagId == 4) {
+
+                } else if (tagId == 5) {
+
+                } else if (tagId == 6) {
+
+                } else if (tagId == 7) {
+
+                } else if (tagId == 8) {
+
+                } else if (tagId == 9) {
+
+                } else if (tagId == 10) {
+
+                } else if (tagId == 11) {
+
+                } else if (tagId == 12) {
+
+                } else if (tagId == 13) {
+
+                } else if (tagId == 14) {
+
+                } else if (tagId == 15) {
+
+                } else if (tagId == 16) {
+
+                }
+            }
             /*
             gets the current Position (x & y in mm, and heading in degrees) of the robot, and prints it.
              */
@@ -361,6 +407,7 @@ public class technotest extends LinearOpMode {
                 timer.update();
                  if (Dps == Dcord) {
                     timer.autoTurn = 0;
+
                     point = 1;
                 } else {
                     timer.autoTurn = -0.3;
@@ -391,6 +438,7 @@ public class technotest extends LinearOpMode {
                 Yps = 100;
             }
 
+            
             //allows a wait before you can press the button again
 
             spinpos = (spinpos + timer.autoSpinBump) ;
