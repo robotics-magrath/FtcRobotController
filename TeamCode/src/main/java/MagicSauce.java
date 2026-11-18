@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
-
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
@@ -48,20 +48,15 @@ public class  MagicSauce extends LinearOpMode {
 
     private static final int SPINDEXER_TICKS_PER_POSITION = 88;
 
-    private static final double flicker_POSITION_INIT = 0.9;
-    private static final double flicker_OPEN_POSITION = 0.3;
-    private static final double flicker_CLOSED_POSITION = 0.8;
+    private static final double DISENGAGER_POSITION_INIT = 1.0;
+    private static final double DISENGAGER_DISENGAGED_POSITION = -1.0;
+    private static final double DISENGAGER_ENGAGED_POSITION = 1.0;
 
-    private int targetOutake = 0;
+
     private int targetIntake = 0;
-    private int spinpos = 0;
-    private double spinoff = 0;
-    private int spinWaitTime = 0;
-    private float Xcord = 0;
-    private float Ycord = 0;
-
-    private boolean spinWait = false;
-    private boolean lastBump = false;
+    private boolean Inactor = false;
+    private double shooterOrder = 0;
+    private double Reingager = 0;
 
     // --- Helper class for timing
     class Robott {
@@ -146,30 +141,19 @@ public class  MagicSauce extends LinearOpMode {
         DcMotor Rightbw = hardwareMap.dcMotor.get("Rightbw");
         DcMotor Rightfw = hardwareMap.dcMotor.get("Rightfw");
         DcMotor Leftfw = hardwareMap.dcMotor.get("Leftfw");
-        DcMotor spindexer = hardwareMap.dcMotor.get("spindexer");
         DcMotor Intake = hardwareMap.dcMotor.get("Intake");
-        DcMotor Outake = hardwareMap.dcMotor.get("Outake");
-
-        Servo flicker = null;
-        flicker = hardwareMap.get(Servo.class, "flicker");
+        DcMotor Spool = hardwareMap.dcMotor.get("Spool");
+        Servo Disengager = hardwareMap.get(Servo.class, "Disengager");
+        TouchSensor touchSensor = hardwareMap.get(TouchSensor.class, "Reingager");
 
         // --- Drive motor setup ---
         Rightfw.setDirection(DcMotorSimple.Direction.REVERSE);
         Rightbw.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        spindexer.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        spindexer.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        spindexer.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
         // --- Arm/Output setup ---
         Intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        Outake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
         Intake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        Outake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
         Intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        Outake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
         /*
@@ -256,44 +240,31 @@ public class  MagicSauce extends LinearOpMode {
         telemetry.update();
 
         waitForStart();
-
-
-        //allows a wait before you can press the button again
-        if (gamepad2.x) {
-            if (spinWait == true) {
-                spinpos = (spinpos - 1) ;
-                spinWaitTime = 30;
-               spinWait = false;
-            }
-        }
-
-        if (spinWaitTime >= 0) {
-            spinWaitTime = spinWaitTime - 1;
-        } else {
-            spinWait = true;
-        }
-            if (gamepad2.right_bumper) {
-
-                flicker.setPosition(1);
-                } else {
-                flicker.setPosition(-1);
+            //--- shooter controls ---
+            if (gamepad2.left_bumper) {
+                Inactor = true;
+            } else {
+                Inactor = false;
             }
 
+            if (Inactor == true) {
+                shooterOrder += 1;
+            }
 
 
             timer.update();
 
-            // --- Manual arm control with d-pad ---
-            if (gamepad2.dpad_up) {
-                targetOutake = 10;
-
-            } else if (gamepad2.dpad_down) {
-                targetOutake = 0;
-
-            } else if (gamepad2.dpad_left) {
-                targetIntake = 10;
-            } else if (gamepad2.dpad_right) {
-                targetIntake = 0;
+            if (shooterOrder == 1) {
+                Disengager.setPosition(DISENGAGER_DISENGAGED_POSITION);
+                shooterOrder += 1;
+            } else if (shooterOrder == 2) {
+                if (Reingager == 0) {
+                    Spool.setPower(1);
+                } else if (Reingager == 1)
+                    Spool.setPower(0);
+                shooterOrder +=1;
+            } else if (shooterOrder == 3) {
+                shooterOrder = 0;
             }
 
             // --- Drive control ---
@@ -308,19 +279,15 @@ public class  MagicSauce extends LinearOpMode {
             Rightfw.setPower((forward - strafe + turn/1.75) / denominator);
             Rightbw.setPower((forward + strafe + turn/1.75) / denominator);
 
-            // --- Spindexer Control ---
-            spinoff = spinoff + gamepad2.left_stick_x;
+            if (touchSensor.isPressed()) {
+                Reingager = 1;
+            } else {
+                Reingager = 0;
+            }
 
-            spindexer.setTargetPosition(spinpos * SPINDEXER_TICKS_PER_POSITION + (int) spinoff);
 
-                spindexer.setPower(1);
-
-            // --- Arm/Output movement ---
-            Outake.setPower(targetOutake);
             Intake.setPower(targetIntake);
             // --- Telemetry ---
-            telemetry.addData("spinpos",  spinpos * SPINDEXER_TICKS_PER_POSITION + (int) spinoff);
-            telemetry.addData("flicker",  flicker.getPosition());
             telemetry.update();
         }
     }
