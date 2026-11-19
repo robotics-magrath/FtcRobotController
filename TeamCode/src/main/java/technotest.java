@@ -377,50 +377,40 @@ public class technotest extends LinearOpMode {
 
 
 
-
-
+            double Speed = (Distance/10);
+            double Ddif = (Dps - Dcord);
             double Xdif = (Xps - Xcord);
             double Ydif = (Yps - Ycord);
+            double Dspeed = (Math.abs(Dps - Dcord)/5);
 
             Distance = (Math.sqrt((Math.pow((Xdif),2)) + (Math.pow((Ydif),2))));
 
             Dps = Math.atan2(Xdif, Ydif);
-            if (Dps < -0.1) {
+            if (Ddif < -0.05) {
                 Dswipswap = 1;
             }
-            else if (Dps > 0.1){
+            else if (Ddif > 0.05){
                 Dswipswap = 0;
             } else {
                 Dswipswap = 2;
             }
 
             if (Dswipswap == 0) {
-                timer.update();
-                 if (Dps == Dcord) {
-                    timer.autoTurn = 0;
-                    point = 1;
-                } else {
-                    timer.autoTurn = 0.3;
-                    point = 0;
-                }
+               timer.autoTurn = Dspeed;
+               point = 0;
             } else if (Dswipswap == 1) {
-                timer.update();
-                 if (Dps == Dcord) {
-                    timer.autoTurn = 0;
-
-                    point = 1;
-                } else {
-                    timer.autoTurn = -0.3;
-                    point = 0;
-                }
+                timer.autoTurn = (Dspeed * -1);
+                point = 0;
             } else {
                 point = 1;
             }
 
             if (Distance >= 20 && point == 1) {
-                timer.autoForward = 0.3;
+                timer.autoForward = Speed;
             } else if (Distance <= -20 && point == 1) {
-                timer.autoForward = -0.3;
+                timer.autoForward = -Speed;
+            } else {
+                timer.autoForward = 0;
             }
 
 
@@ -432,10 +422,10 @@ public class technotest extends LinearOpMode {
 
 
             waitForStart();
+            Yps = 0;
             Xps = 0;
-
             if (Order == 1) {
-                Yps = 100;
+                Xps = 50;
             }
 
             

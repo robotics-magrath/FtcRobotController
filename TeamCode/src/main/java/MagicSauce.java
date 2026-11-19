@@ -48,7 +48,7 @@ public class  MagicSauce extends LinearOpMode {
 
     private static final int SPINDEXER_TICKS_PER_POSITION = 88;
 
-    private static final double DISENGAGER_POSITION_INIT = 1.0;
+
     private static final double DISENGAGER_DISENGAGED_POSITION = -1.0;
     private static final double DISENGAGER_ENGAGED_POSITION = 1.0;
 
@@ -261,10 +261,18 @@ public class  MagicSauce extends LinearOpMode {
                 if (Reingager == 0) {
                     Spool.setPower(1);
                 } else if (Reingager == 1)
+                    Disengager.setPosition(DISENGAGER_ENGAGED_POSITION);
                     Spool.setPower(0);
                 shooterOrder +=1;
             } else if (shooterOrder == 3) {
                 shooterOrder = 0;
+            }
+
+
+            if (gamepad2.dpad_up) {
+                targetIntake = 10;
+            } else if (gamepad2.dpad_down) {
+                targetIntake = 0;
             }
 
             // --- Drive control ---
