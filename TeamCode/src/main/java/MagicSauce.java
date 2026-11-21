@@ -40,6 +40,9 @@ public class  MagicSauce extends LinearOpMode {
     private static final double DISENGAGER_DISENGAGED_POSITION = 1.0;
     private static final double DISENGAGER_ENGAGED_POSITION = -1.0;
 
+    private static final double  OPEN_POSITION = 1.0;
+    private static final double CLOSED_POSITION = -1.0;
+
 
     // --- important variables ---
     private int targetIntake = 0;
@@ -137,6 +140,7 @@ public class  MagicSauce extends LinearOpMode {
         DcMotor Intake = hardwareMap.dcMotor.get("Intake");
         DcMotor Spool = hardwareMap.dcMotor.get("Spool");
         Servo Disengager = hardwareMap.get(Servo.class, "Disengager");
+        Servo bumpers = hardwareMap.get(Servo.class, "bumpers");
         touchSensor =  hardwareMap.get(DigitalChannel.class, "Reingager");
 
         // --- Drive motor setup ---
@@ -218,6 +222,14 @@ public class  MagicSauce extends LinearOpMode {
                 targetIntake = 7;
             } else if (gamepad2.dpad_down) {
                 targetIntake = 0;
+            }
+
+            if (gamepad2.x) {
+                bumpers.setPosition(OPEN_POSITION);
+            }
+
+            if (gamepad2.y) {
+                bumpers.setPosition(CLOSED_POSITION);
             }
 
             // --- Drive control ---

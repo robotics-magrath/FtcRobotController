@@ -325,10 +325,7 @@ public class technotest extends LinearOpMode {
 
 
                 if (tagId == 1) {
-                    Leftbw.setPower(1);
-                    Rightbw.setPower(1);
-                    Leftfw.setPower(1);
-                    Rightfw.setPower(1);
+
                 } else if (tagId == 2) {
 
                 } else if (tagId == 3) {
