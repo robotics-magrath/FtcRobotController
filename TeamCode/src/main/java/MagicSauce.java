@@ -39,8 +39,6 @@ public class  MagicSauce extends LinearOpMode {
     // --- set positions for disengager ---
     private static final double DISENGAGER_DISENGAGED_POSITION = 1.0;
     private static final double DISENGAGER_ENGAGED_POSITION = -1.0;
-    private static final double DISENGAGER2_DISENGAGED_POSITION = -1.0;
-    private static final double DISENGAGER2_ENGAGED_POSITION = 1.0;
 
     private static final double  OPEN_POSITION = 1.0;
     private static final double CLOSED_POSITION = -1.0;
@@ -142,7 +140,6 @@ public class  MagicSauce extends LinearOpMode {
         DcMotor Intake = hardwareMap.dcMotor.get("Intake");
         DcMotor Spool = hardwareMap.dcMotor.get("Spool");
         Servo Disengager = hardwareMap.get(Servo.class, "Disengager");
-        Servo Disengager2 = hardwareMap.get(Servo.class, "Disengager2");
         Servo bumpers = hardwareMap.get(Servo.class, "bumpers");
         touchSensor =  hardwareMap.get(DigitalChannel.class, "Reingager");
 
@@ -196,7 +193,20 @@ public class  MagicSauce extends LinearOpMode {
 
         waitForStart();
             //--- shooter controls ---
-            if (gamepad2.left_bumper && !Inactor) {
+            if (gamepad2.x) {
+                Spool.setPower(-1);
+            } else {
+                Spool.setPower(0);
+            }
+
+            if (gamepad2.y) {
+                Spool.setPower(1);
+            } else {
+                Spool.setPower(0);
+            }
+
+
+           /* if (gamepad2.left_bumper && !Inactor) {
                 Inactor = true;
                 shooterOrder += 1;
             }
@@ -207,14 +217,12 @@ public class  MagicSauce extends LinearOpMode {
 
             if (shooterOrder == 1) {
                 Disengager.setPosition(DISENGAGER_DISENGAGED_POSITION);
-                Disengager2.setPosition(DISENGAGER2_DISENGAGED_POSITION);
                 shooterOrder += 1;
             } else if (shooterOrder == 2) {
                 if (0 == Reingager) {
                     Spool.setPower(0.3);
                 } else if (Reingager == 1) {
                     Disengager.setPosition(DISENGAGER_ENGAGED_POSITION);
-                    Disengager2.setPosition(DISENGAGER2_ENGAGED_POSITION);
                     Spool.setPower(0);
                     shooterOrder += 1;
                 }
@@ -235,7 +243,7 @@ public class  MagicSauce extends LinearOpMode {
 
             if (gamepad2.y) {
                 bumpers.setPosition(CLOSED_POSITION);
-            }
+            }*/
 
             // --- Drive control ---
             double forward = -gamepad1.left_stick_y;

@@ -420,14 +420,16 @@ public class technotest extends LinearOpMode {
 
 
             double Speed = (Distance/10);
-            double Ddif = (Dps - Dcord);
+
             double Xdif = (Xps - Xcord);
             double Ydif = (Yps - Ycord);
+            Dps = Math.atan2(Xdif, Ydif);
+            double Ddif = (Dps - Dcord);
             double Dspeed = (Math.abs(Dps - Dcord)/2);
 
             Distance = (Math.sqrt((Math.pow((Xdif),2)) + (Math.pow((Ydif),2))));
 
-            Dps = Math.atan2(Xdif, Ydif);
+
             if (Ddif < -0.05) {
                 Dswipswap = 1;
             }
