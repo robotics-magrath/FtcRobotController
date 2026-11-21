@@ -236,7 +236,7 @@ public class technotest extends LinearOpMode {
 
 
     }
-    double loaded = 1;
+
     @Override
     public void runOpMode() {
         // --- Hardware Mapping ---
@@ -308,6 +308,7 @@ public class technotest extends LinearOpMode {
             double newTime = getRuntime();
             double loopTime = newTime-oldTime;
             double frequency = 1/loopTime;
+            double loaded = 1;
             oldTime = newTime;
             //Huskylens
             if (loaded == 1) {
@@ -568,7 +569,7 @@ public class technotest extends LinearOpMode {
                     }
                 }
             } else if (loaded == 0) {
-                huskyLens.selectAlgorithm(HuskyLens.Algorithm.COLOR_RECOGNITION);
+                huskyLens.selectAlgorithm(HuskyLens.Algorithm.OBJECT_RECOGNITION);
             }
 
             /*
