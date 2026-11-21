@@ -5,9 +5,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
@@ -15,7 +17,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit
 
 import java.util.Locale;
 
-@TeleOp(name="Decode Teleop", group="Linear Opmode")
+@TeleOp(name="BioBuzz Teleop", group="Linear Opmode")
 public class  MagicSauce extends LinearOpMode {
 
 
@@ -34,29 +36,20 @@ public class  MagicSauce extends LinearOpMode {
 
     private RobotState currentState = RobotState.INIT;
 
-    // Arm and wrist target positions for each state
-    private static final int ARM_POSITION_INTAKE = 450;
-    private static final int ARM_POSITION_WALL_GRAB = 1100;
-    private static final int ARM_POSITION_WALL_UNHOOK = 1700;
-    private static final int ARM_POSITION_HOVER_HIGH = 2600;
-    private static final int ARM_POSITION_CLIP_HIGH = 2100;
-    private static final int ARM_POSITION_LOW_BASKET = 2500;
-
-    private static final int WRIST_POSITION_INIT = -490;
-    private static final int WRIST_POSITION_SAMPLE = 270;
-    private static final int WRIST_POSITION_SPEC = 10;
-
-    private static final int SPINDEXER_TICKS_PER_POSITION = 88;
+    // --- set positions for disengager ---
+    private static final double DISENGAGER_DISENGAGED_POSITION = 1.0;
+    private static final double DISENGAGER_ENGAGED_POSITION = -1.0;
 
 
-    private static final double DISENGAGER_DISENGAGED_POSITION = -1.0;
-    private static final double DISENGAGER_ENGAGED_POSITION = 1.0;
-
-
+    // --- important variables ---
     private int targetIntake = 0;
     private boolean Inactor = false;
     private double shooterOrder = 0;
     private double Reingager = 0;
+    private DigitalChannel touchSensor;
+
+
+
 
     // --- Helper class for timing
     class Robott {
@@ -144,25 +137,21 @@ public class  MagicSauce extends LinearOpMode {
         DcMotor Intake = hardwareMap.dcMotor.get("Intake");
         DcMotor Spool = hardwareMap.dcMotor.get("Spool");
         Servo Disengager = hardwareMap.get(Servo.class, "Disengager");
-        TouchSensor touchSensor = hardwareMap.get(TouchSensor.class, "Reingager");
+        touchSensor =  hardwareMap.get(DigitalChannel.class, "Reingager");
 
         // --- Drive motor setup ---
         Rightfw.setDirection(DcMotorSimple.Direction.REVERSE);
         Rightbw.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        // --- Arm/Output setup ---
+        // --- Intake setup ---
         Intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Intake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         Intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Intake.setPower(targetIntake);
 
+        // --- touch sensor setup ---
+        touchSensor.setMode(DigitalChannel.Mode.INPUT);
 
-        /*
-        telemetry.addData("Status", "Initialized");
-        telemetry.addData("X offset", odo.getXOffset(DistanceUnit.MM));
-        telemetry.addData("Y offset", odo.getYOffset(DistanceUnit.MM));
-        telemetry.addData("Device Version Number:", odo.getDeviceVersion());
-        telemetry.addData("Heading Scalar", odo.getYawScalar());
-        telemetry.update();*/
 
         // Wait for the game to start (driver presses START)
         waitForStart();
@@ -174,33 +163,7 @@ public class  MagicSauce extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-            /*
-            Request an update from the Pinpoint odometry computer. This checks almost all outputs
-            from the device in a single I2C read.
-             */
 
-
-            /*
-            Optionally, you can update only the heading of the device. This takes less time to read, but will not
-            pull any other data. Only the heading (which you can pull with getHeading() or in getPosition().
-             */
-            //odo.update(GoBildaPinpointDriver.ReadData.ONLY_UPDATE_HEADING);
-
-
-            /*if (gamepad1.a){
-                odo.resetPosAndIMU(); //resets the position to 0 and recalibrates the IMU
-            }
-
-            if (gamepad1.b){
-                odo.recalibrateIMU(); //recalibrates the IMU without resetting position
-            }/*
-
-            /*
-            This code prints the loop frequency of the REV Control Hub. This frequency is effected
-            by I²C reads/writes. So it's good to keep an eye on. This code calculates the amount
-            of time each cycle takes and finds the frequency (number of updates per second) from
-            that cycle time.
-             */
             double newTime = getRuntime();
             double loopTime = newTime-oldTime;
             double frequency = 1/loopTime;
@@ -218,59 +181,41 @@ public class  MagicSauce extends LinearOpMode {
             telemetry.addData("Velocity", timer.getVelocity());
 
 
-            /*
-            Gets the Pinpoint device status. Pinpoint can reflect a few states. But we'll primarily see
-            READY: the device is working as normal
-            CALIBRATING: the device is calibrating and outputs are put on hold
-            NOT_READY: the device is resetting from scratch. This should only happen after a power-cycle
-            FAULT_NO_PODS_DETECTED - the device does not detect any pods plugged in
-            FAULT_X_POD_NOT_DETECTED - The device does not detect an X pod plugged in
-            FAULT_Y_POD_NOT_DETECTED - The device does not detect a Y pod plugged in
-            FAULT_BAD_READ - The firmware detected a bad I²C read, if a bad read is detected, the device status is updated and the previous position is reported
 
-            telemetry.addData("Status", odo.getDeviceStatus());
-
-            telemetry.addData("Pinpoint Frequency", odo.getFrequency()); //prints/gets the current refresh rate of the Pinpoint
-            telemetry.addData("REV Hub Frequency: ", frequency); //prints the control system refresh rate
-            telemetry.update();
-            */
 
 
         telemetry.addData("Status", "Initialized");
-        telemetry.update();
+
 
         waitForStart();
             //--- shooter controls ---
-            if (gamepad2.left_bumper) {
+            if (gamepad2.left_bumper && !Inactor) {
                 Inactor = true;
-            } else {
-                Inactor = false;
-            }
-
-            if (Inactor == true) {
                 shooterOrder += 1;
             }
 
-
-            timer.update();
+            if (!gamepad2.left_bumper && shooterOrder == 0) {
+                Inactor = false;
+            }
 
             if (shooterOrder == 1) {
                 Disengager.setPosition(DISENGAGER_DISENGAGED_POSITION);
                 shooterOrder += 1;
             } else if (shooterOrder == 2) {
-                if (Reingager == 0) {
-                    Spool.setPower(1);
-                } else if (Reingager == 1)
+                if (0 == Reingager) {
+                    Spool.setPower(0.3);
+                } else if (Reingager == 1) {
                     Disengager.setPosition(DISENGAGER_ENGAGED_POSITION);
                     Spool.setPower(0);
-                shooterOrder +=1;
+                    shooterOrder += 1;
+                }
             } else if (shooterOrder == 3) {
                 shooterOrder = 0;
             }
 
-
+           // --- intake controls ---
             if (gamepad2.dpad_up) {
-                targetIntake = 10;
+                targetIntake = 7;
             } else if (gamepad2.dpad_down) {
                 targetIntake = 0;
             }
@@ -279,7 +224,7 @@ public class  MagicSauce extends LinearOpMode {
             double forward = -gamepad1.left_stick_y;
             double strafe = -gamepad1.left_stick_x;
             double turn = gamepad1.right_stick_x;
-
+     
             double denominator = Math.max(Math.abs(forward) + Math.abs(strafe) + Math.abs(turn), 1);
 
             Leftfw.setPower((forward + strafe - turn/1.75) / denominator);
@@ -287,15 +232,19 @@ public class  MagicSauce extends LinearOpMode {
             Rightfw.setPower((forward - strafe + turn/1.75) / denominator);
             Rightbw.setPower((forward + strafe + turn/1.75) / denominator);
 
-            if (touchSensor.isPressed()) {
+            // --- touch sensor settings ---
+            if (touchSensor.getState() == false) {
                 Reingager = 1;
             } else {
                 Reingager = 0;
             }
 
 
-            Intake.setPower(targetIntake);
+
             // --- Telemetry ---
+
+            telemetry.addData("shooterOrder" ,shooterOrder);
+            telemetry.addData("Reingager" , Reingager);
             telemetry.update();
         }
     }

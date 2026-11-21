@@ -322,8 +322,7 @@ public class technotest extends LinearOpMode {
                 int xCenter = blocks[0].x;
                 int width = blocks[0].width;
 
-                telemetry.addData("Tag ID", tagId);
-                telemetry.addData("X Position", xCenter);
+
 
                 if (tagId == 1) {
                     Leftbw.setPower(1);
@@ -368,12 +367,12 @@ public class technotest extends LinearOpMode {
             Xcord = timer.getXcoord();
             Ycord = timer.getYcoord();
             Dcord = timer.getOrientation();
-            telemetry.addData("Position", timer.getPositionString());
+
 
             /*
             gets the current Velocity (x & y in mm/sec and heading in degrees/sec) and prints it.
              */
-            telemetry.addData("Velocity", timer.getVelocityString());
+
 
 
 
@@ -381,7 +380,7 @@ public class technotest extends LinearOpMode {
             double Ddif = (Dps - Dcord);
             double Xdif = (Xps - Xcord);
             double Ydif = (Yps - Ycord);
-            double Dspeed = (Math.abs(Dps - Dcord)/5);
+            double Dspeed = (Math.abs(Dps - Dcord)/2);
 
             Distance = (Math.sqrt((Math.pow((Xdif),2)) + (Math.pow((Ydif),2))));
 
@@ -457,8 +456,10 @@ public class technotest extends LinearOpMode {
             Rightfw.setPower((forward - strafe - turn) / denominator);
             Rightbw.setPower((forward + strafe - turn) / denominator);
 
-
-
+            telemetry.addData("Velocity", timer.getVelocityString());
+            telemetry.addData("Position", timer.getPositionString());
+            telemetry.addData("Point" , point);
+            telemetry.addData("Dswipswap" , Dswipswap);
             telemetry.update();
         }
     }
