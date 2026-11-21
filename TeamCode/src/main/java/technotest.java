@@ -62,6 +62,8 @@ public class technotest extends LinearOpMode {
     private boolean Inactor = false;
     private double shooterOrder = 0;
     private double Reingager = 0;
+
+    private double autoShoot = 0;
     private DigitalChannel touchSensor;
 
     private final boolean spinWait = false;
@@ -309,6 +311,7 @@ public class technotest extends LinearOpMode {
             double loopTime = newTime-oldTime;
             double frequency = 1/loopTime;
             double loaded = 1;
+            double Autocenter = 0;
             oldTime = newTime;
             //Huskylens
             if (loaded == 1) {
@@ -327,241 +330,49 @@ public class technotest extends LinearOpMode {
                     telemetry.addData("Y Position", yCenter);
 
                     if (tagId == 1) {
-                        if (xCenter > 50) {
-                            timer.autoStrafe = -1;
-                        } else if (xCenter < -50) {
-                            timer.autoStrafe = 1;
-                        } else {
-                            timer.autoStrafe = 0;
-                        }
-                        if (yCenter > 200) {
-                            timer.autoForward = 1;
-                        } else if (yCenter < 100) {
-                            timer.autoForward = -1;
-                        } else {
-                            timer.autoForward = 0;
-                        }
+                        Autocenter = 1;
                     } else if (tagId == 2) {
-                        if (xCenter > 50) {
-                            timer.autoStrafe = -1;
-                        } else if (xCenter < -50) {
-                            timer.autoStrafe = 1;
-                        } else {
-                            timer.autoStrafe = 0;
-                        }
-                        if (yCenter > 200) {
-                            timer.autoForward = 1;
-                        } else if (yCenter < 100) {
-                            timer.autoForward = -1;
-                        } else {
-                            timer.autoForward = 0;
-                        }
+                        Autocenter = 1;
                     } else if (tagId == 3) {
-                        if (xCenter > 50) {
-                            timer.autoStrafe = -1;
-                        } else if (xCenter < -50) {
-                            timer.autoStrafe = 1;
-                        } else {
-                            timer.autoStrafe = 0;
-                        }
-                        if (yCenter > 200) {
-                            timer.autoForward = 1;
-                        } else if (yCenter < 100) {
-                            timer.autoForward = -1;
-                        } else {
-                            timer.autoForward = 0;
-                        }
+                        Autocenter = 1;
                     } else if (tagId == 4) {
-                        if (xCenter > 50) {
-                            timer.autoStrafe = -1;
-                        } else if (xCenter < -50) {
-                            timer.autoStrafe = 1;
-                        } else {
-                            timer.autoStrafe = 0;
-                        }
-                        if (yCenter > 200) {
-                            timer.autoForward = 1;
-                        } else if (yCenter < 100) {
-                            timer.autoForward = -1;
-                        } else {
-                            timer.autoForward = 0;
-                        }
+                        Autocenter = 1;
                     } else if (tagId == 5) {
-                        if (xCenter > 50) {
-                            timer.autoStrafe = -1;
-                        } else if (xCenter < -50) {
-                            timer.autoStrafe = 1;
-                        } else {
-                            timer.autoStrafe = 0;
-                        }
-                        if (yCenter > 200) {
-                            timer.autoForward = 1;
-                        } else if (yCenter < 100) {
-                            timer.autoForward = -1;
-                        } else {
-                            timer.autoForward = 0;
-                        }
+                        Autocenter = 1;
                     } else if (tagId == 6) {
-                        if (xCenter > 50) {
-                            timer.autoStrafe = -1;
-                        } else if (xCenter < -50) {
-                            timer.autoStrafe = 1;
-                        } else {
-                            timer.autoStrafe = 0;
-                        }
-                        if (yCenter > 200) {
-                            timer.autoForward = 1;
-                        } else if (yCenter < 100) {
-                            timer.autoForward = -1;
-                        } else {
-                            timer.autoForward = 0;
-                        }
+                        Autocenter = 1;
                     } else if (tagId == 7) {
-                        if (xCenter > 50) {
-                            timer.autoStrafe = -1;
-                        } else if (xCenter < -50) {
-                            timer.autoStrafe = 1;
-                        } else {
-                            timer.autoStrafe = 0;
-                        }
-                        if (yCenter > 200) {
-                            timer.autoForward = 1;
-                        } else if (yCenter < 100) {
-                            timer.autoForward = -1;
-                        } else {
-                            timer.autoForward = 0;
-                        }
+                        Autocenter = 1;
                     } else if (tagId == 8) {
-                        if (xCenter > 50) {
-                            timer.autoStrafe = -1;
-                        } else if (xCenter < -50) {
-                            timer.autoStrafe = 1;
-                        } else {
-                            timer.autoStrafe = 0;
-                        }
-                        if (yCenter > 200) {
-                            timer.autoForward = 1;
-                        } else if (yCenter < 100) {
-                            timer.autoForward = -1;
-                        } else {
-                            timer.autoForward = 0;
-                        }
+                        Autocenter = 1;
                     } else if (tagId == 9) {
-                        if (xCenter > 50) {
-                            timer.autoStrafe = -1;
-                        } else if (xCenter < -50) {
-                            timer.autoStrafe = 1;
-                        } else {
-                            timer.autoStrafe = 0;
-                        }
-                        if (yCenter > 200) {
-                            timer.autoForward = 1;
-                        } else if (yCenter < 100) {
-                            timer.autoForward = -1;
-                        } else {
-                            timer.autoForward = 0;
-                        }
+                        Autocenter = 1;
                     } else if (tagId == 10) {
-                        if (xCenter > 50) {
-                            timer.autoStrafe = -1;
-                        } else if (xCenter < -50) {
-                            timer.autoStrafe = 1;
-                        } else {
-                            timer.autoStrafe = 0;
-                        }
-                        if (yCenter > 200) {
-                            timer.autoForward = 1;
-                        } else if (yCenter < 100) {
-                            timer.autoForward = -1;
-                        } else {
-                            timer.autoForward = 0;
-                        }
+                        Autocenter = 1;
                     } else if (tagId == 11) {
-                        if (xCenter > 50) {
-                            timer.autoStrafe = -1;
-                        } else if (xCenter < -50) {
-                            timer.autoStrafe = 1;
-                        } else {
-                            timer.autoStrafe = 0;
-                        }
-                        if (yCenter > 200) {
-                            timer.autoForward = 1;
-                        } else if (yCenter < 100) {
-                            timer.autoForward = -1;
-                        } else {
-                            timer.autoForward = 0;
-                        }
+                        Autocenter = 1;
                     } else if (tagId == 12) {
-                        if (xCenter > 50) {
-                            timer.autoStrafe = -1;
-                        } else if (xCenter < -50) {
-                            timer.autoStrafe = 1;
-                        } else {
-                            timer.autoStrafe = 0;
-                        }
-                        if (yCenter > 200) {
-                            timer.autoForward = 1;
-                        } else if (yCenter < 100) {
-                            timer.autoForward = -1;
-                        } else {
-                            timer.autoForward = 0;
-                        }
+                        Autocenter = 1;
                     } else if (tagId == 13) {
-                        if (xCenter > 50) {
-                            timer.autoStrafe = -1;
-                        } else if (xCenter < -50) {
-                            timer.autoStrafe = 1;
-                        } else {
-                            timer.autoStrafe = 0;
-                        }
-                        if (yCenter > 200) {
-                            timer.autoForward = 1;
-                        } else if (yCenter < 100) {
-                            timer.autoForward = -1;
-                        } else {
-                            timer.autoForward = 0;
-                        }
+                        Autocenter = 1;
                     } else if (tagId == 14) {
-                        if (xCenter > 50) {
-                            timer.autoStrafe = -1;
-                        } else if (xCenter < -50) {
-                            timer.autoStrafe = 1;
-                        } else {
-                            timer.autoStrafe = 0;
-                        }
-                        if (yCenter > 200) {
-                            timer.autoForward = 1;
-                        } else if (yCenter < 100) {
-                            timer.autoForward = -1;
-                        } else {
-                            timer.autoForward = 0;
-                        }
+                        Autocenter = 1;
                     } else if (tagId == 15) {
-                        if (xCenter > 50) {
-                            timer.autoStrafe = -1;
-                        } else if (xCenter < -50) {
-                            timer.autoStrafe = 1;
-                        } else {
-                            timer.autoStrafe = 0;
-                        }
-                        if (yCenter > 200) {
-                            timer.autoForward = 1;
-                        } else if (yCenter < 100) {
-                            timer.autoForward = -1;
-                        } else {
-                            timer.autoForward = 0;
-                        }
+                        Autocenter = 1;
                     } else if (tagId == 16) {
-                        if (xCenter > 50) {
+                        Autocenter = 1;
+                    }
+                    if (Autocenter == 1) {
+                        if (xCenter > 180) {
                             timer.autoStrafe = -1;
-                        } else if (xCenter < -50) {
+                        } else if (xCenter < 140) {
                             timer.autoStrafe = 1;
                         } else {
                             timer.autoStrafe = 0;
                         }
-                        if (yCenter > 200) {
+                        if (yCenter > 100) {
                             timer.autoForward = 1;
-                        } else if (yCenter < 100) {
+                        } else if (yCenter < 60) {
                             timer.autoForward = -1;
                         } else {
                             timer.autoForward = 0;
@@ -583,14 +394,12 @@ public class technotest extends LinearOpMode {
             /*
             gets the current Velocity (x & y in mm/sec and heading in degrees/sec) and prints it.
              */
-            if (gamepad2.left_bumper && !Inactor) {
+            if (autoShoot == 1 && !Inactor) {
                 Inactor = true;
                 shooterOrder += 1;
+                autoShoot = 0;
             }
 
-            if (!gamepad2.left_bumper && shooterOrder == 0) {
-                Inactor = false;
-            }
 
             if (shooterOrder == 1) {
                 Disengager.setPosition(DISENGAGER_DISENGAGED_POSITION);
