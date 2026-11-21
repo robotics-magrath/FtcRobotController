@@ -391,31 +391,35 @@ public class technotest extends LinearOpMode {
             Ycord = timer.getYcoord();
             Dcord = timer.getOrientation();
 
-
+            telemetry.addData("Velocity", timer.getVelocityString());
+            telemetry.addData("Position", timer.getPositionString());
+            telemetry.addData("Point" , point);
+            telemetry.addData("Dswipswap" , Dswipswap);
+            telemetry.update();
             /*
             gets the current Velocity (x & y in mm/sec and heading in degrees/sec) and prints it.
              */
-            if (autoShoot == 1 && !Inactor) {
-                Inactor = true;
-                shooterOrder += 1;
-                autoShoot = 0;
-            }
-
-
-            if (shooterOrder == 1) {
-                Disengager.setPosition(DISENGAGER_DISENGAGED_POSITION);
-                shooterOrder += 1;
-            } else if (shooterOrder == 2) {
-                if (0 == Reingager) {
-                    Spool.setPower(0.3);
-                } else if (Reingager == 1) {
-                    Disengager.setPosition(DISENGAGER_ENGAGED_POSITION);
-                    Spool.setPower(0);
-                    shooterOrder += 1;
-                }
-            } else if (shooterOrder == 3) {
-                shooterOrder = 0;
-            }
+//            if (autoShoot == 1 && !Inactor) {
+//                Inactor = true;
+//                shooterOrder += 1;
+//                autoShoot = 0;
+//            }
+//
+//
+//            if (shooterOrder == 1) {
+//                Disengager.setPosition(DISENGAGER_DISENGAGED_POSITION);
+//                shooterOrder += 1;
+//            } else if (shooterOrder == 2) {
+//                if (0 == Reingager) {
+//                    Spool.setPower(0.3);
+//                } else if (Reingager == 1) {
+//                    Disengager.setPosition(DISENGAGER_ENGAGED_POSITION);
+//                    Spool.setPower(0);
+//                    shooterOrder += 1;
+//                }
+//            } else if (shooterOrder == 3) {
+//                shooterOrder = 0;
+//            }
 
 
 
@@ -425,7 +429,7 @@ public class technotest extends LinearOpMode {
             double Ydif = (Yps - Ycord);
             Dps = Math.atan2(Xdif, Ydif);
             double Ddif = (Dps - Dcord);
-            double Dspeed = (Math.abs(Dps - Dcord)/2);
+            double Dspeed = (Math.abs(Dps - Dcord)/5);
 
             Distance = (Math.sqrt((Math.pow((Xdif),2)) + (Math.pow((Ydif),2))));
 
@@ -440,10 +444,10 @@ public class technotest extends LinearOpMode {
             }
 
             if (Dswipswap == 0) {
-               timer.autoTurn = Dspeed;
+               timer.autoTurn = (Dspeed * -1);
                point = 0;
             } else if (Dswipswap == 1) {
-                timer.autoTurn = (Dspeed * -1);
+                timer.autoTurn = Dspeed;
                 point = 0;
             } else {
                 point = 1;
@@ -501,11 +505,7 @@ public class technotest extends LinearOpMode {
             Rightfw.setPower((forward - strafe - turn) / denominator);
             Rightbw.setPower((forward + strafe - turn) / denominator);
 
-            telemetry.addData("Velocity", timer.getVelocityString());
-            telemetry.addData("Position", timer.getPositionString());
-            telemetry.addData("Point" , point);
-            telemetry.addData("Dswipswap" , Dswipswap);
-            telemetry.update();
+
         }
     }
 }

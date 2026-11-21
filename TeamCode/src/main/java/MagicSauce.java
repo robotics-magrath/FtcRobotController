@@ -246,16 +246,16 @@ public class  MagicSauce extends LinearOpMode {
             }*/
 
             // --- Drive control ---
-            double forward = -gamepad1.left_stick_y;
-            double strafe = -gamepad1.left_stick_x;
+            double forward = gamepad1.left_stick_y;
+            double strafe = gamepad1.left_stick_x;
             double turn = gamepad1.right_stick_x;
      
             double denominator = Math.max(Math.abs(forward) + Math.abs(strafe) + Math.abs(turn), 1);
 
             Leftfw.setPower((forward + strafe - turn/1.75) / denominator);
             Leftbw.setPower((forward - strafe - turn/1.75) / denominator);
-            Rightfw.setPower((forward - strafe + turn/1.75) / denominator);
-            Rightbw.setPower((forward + strafe + turn/1.75) / denominator);
+            Rightfw.setPower((forward + strafe + turn/1.75) / denominator);
+            Rightbw.setPower((forward - strafe + turn/1.75) / denominator);
 
             // --- touch sensor settings ---
             if (touchSensor.getState() == false) {
