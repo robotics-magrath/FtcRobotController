@@ -328,6 +328,7 @@ public class technotest extends LinearOpMode {
                     telemetry.addData("Tag ID", tagId);
                     telemetry.addData("X Position", xCenter);
                     telemetry.addData("Y Position", yCenter);
+                    telemetry.addData("Width of Tag", width);
 
                     if (tagId == 1) {
                         Autocenter = 1;
