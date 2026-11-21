@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -37,22 +38,10 @@ public class technotest extends LinearOpMode {
     private final RobotState currentState = RobotState.INIT;
 
     // Arm and wrist target positions for each state
-    private static final int ARM_POSITION_INTAKE = 450;
-    private static final int ARM_POSITION_WALL_GRAB = 1100;
-    private static final int ARM_POSITION_WALL_UNHOOK = 1700;
-    private static final int ARM_POSITION_HOVER_HIGH = 2600;
-    private static final int ARM_POSITION_CLIP_HIGH = 2100;
-    private static final int ARM_POSITION_LOW_BASKET = 2500;
+   
 
-    private static final int WRIST_POSITION_INIT = -490;
-    private static final int WRIST_POSITION_SAMPLE = 270;
-    private static final int WRIST_POSITION_SPEC = 10;
-
-    private static final int SPINDEXER_TICKS_PER_POSITION = 85;
-
-    private static final double CLAW_POSITION_INIT = 0.9;
-    private static final double CLAW_OPEN_POSITION = 0.3;
-    private static final double CLAW_CLOSED_POSITION = 0.8;
+    private static final double DISENGAGER_DISENGAGED_POSITION = 1.0;
+    private static final double DISENGAGER_ENGAGED_POSITION = -1.0;
     private HuskyLens huskyLens;
     private int targetOutake = 0;
     private int targetIntake = 0;
@@ -70,6 +59,10 @@ public class technotest extends LinearOpMode {
     private double Dswipswap = 0;
     private double point = 0;
     private final int READ_PERIOD = 1;
+    private boolean Inactor = false;
+    private double shooterOrder = 0;
+    private double Reingager = 0;
+    private DigitalChannel touchSensor;
 
     private final boolean spinWait = false;
 
@@ -251,6 +244,10 @@ public class technotest extends LinearOpMode {
         DcMotor Rightbw = hardwareMap.dcMotor.get("Rightbw");
         DcMotor Rightfw = hardwareMap.dcMotor.get("Rightfw");
         DcMotor Leftfw = hardwareMap.dcMotor.get("Leftfw");
+        DcMotor Intake = hardwareMap.dcMotor.get("Intake");
+        DcMotor Spool = hardwareMap.dcMotor.get("Spool");
+        Servo Disengager = hardwareMap.get(Servo.class, "Disengager");
+        touchSensor =  hardwareMap.get(DigitalChannel.class, "Reingager");
         // Husky Hardware Mapping
         huskyLens = hardwareMap.get(HuskyLens.class, "huskylens");
 
@@ -585,7 +582,29 @@ public class technotest extends LinearOpMode {
             /*
             gets the current Velocity (x & y in mm/sec and heading in degrees/sec) and prints it.
              */
+            if (gamepad2.left_bumper && !Inactor) {
+                Inactor = true;
+                shooterOrder += 1;
+            }
 
+            if (!gamepad2.left_bumper && shooterOrder == 0) {
+                Inactor = false;
+            }
+
+            if (shooterOrder == 1) {
+                Disengager.setPosition(DISENGAGER_DISENGAGED_POSITION);
+                shooterOrder += 1;
+            } else if (shooterOrder == 2) {
+                if (0 == Reingager) {
+                    Spool.setPower(0.3);
+                } else if (Reingager == 1) {
+                    Disengager.setPosition(DISENGAGER_ENGAGED_POSITION);
+                    Spool.setPower(0);
+                    shooterOrder += 1;
+                }
+            } else if (shooterOrder == 3) {
+                shooterOrder = 0;
+            }
 
 
 
