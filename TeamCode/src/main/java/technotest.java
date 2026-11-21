@@ -364,11 +364,11 @@ public class technotest extends LinearOpMode {
                     }
                     if (Autocenter == 1) {
                         if (xCenter > 180) {
-                            timer.autoStrafe = -1;
+                            timer.autoTurn = -1;
                         } else if (xCenter < 140) {
-                            timer.autoStrafe = 1;
+                            timer.autoTurn = 1;
                         } else {
-                            timer.autoStrafe = 0;
+                            timer.autoTurn = 0;
                         }
                         if (yCenter > 100) {
                             timer.autoForward = 1;
