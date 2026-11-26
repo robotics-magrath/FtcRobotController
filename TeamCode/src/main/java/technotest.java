@@ -224,13 +224,8 @@ public class technotest extends LinearOpMode {
         }
 
         Double getXcoord() {
-            //Pose2D pos = odo.getPosition();
-            //return pos.getX(DistanceUnit.CM);
-            if (currentTime < 500) {
-                return 10.0;
-            } else {
-                return 50.0;
-            }
+            Pose2D pos = odo.getPosition();
+            return pos.getX(DistanceUnit.CM);
         }
 
         Double getYcoord() {
