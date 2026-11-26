@@ -18,7 +18,7 @@ import java.math.MathContext;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-@TeleOp(name="Decode odo", group="Linear Opmode")
+@TeleOp(name="BioBuzz Auto", group="Linear Opmode")
 public class technotest extends LinearOpMode {
 
 
