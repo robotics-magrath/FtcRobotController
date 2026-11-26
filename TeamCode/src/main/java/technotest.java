@@ -404,6 +404,7 @@ public class technotest extends LinearOpMode {
             telemetry.addData("Odo status", timer.odo.getDeviceStatus());
             telemetry.addData("Odo raw X/Y ticks", "%d / %d", timer.odo.getEncoderX(), timer.odo.getEncoderY());
             telemetry.addData("Odo freq (Hz)", timer.odo.getFrequency());
+            telemetry.addData("Odo firmware / loopTime(us)", "%d / %d", timer.odo.getDeviceVersion(), timer.odo.getLoopTime());
             telemetry.addData("Point", point);
             telemetry.addData("Dswipswap", Dswipswap);
             telemetry.addData("timer", timer.currentTime);
