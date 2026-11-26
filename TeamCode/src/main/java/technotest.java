@@ -22,8 +22,8 @@ import java.util.concurrent.TimeUnit;
 public class technotest extends LinearOpMode {
 
 
-
     double oldTime = 0;
+
     private enum RobotState {
         INIT,
         INTAKE,
@@ -38,7 +38,7 @@ public class technotest extends LinearOpMode {
     private final RobotState currentState = RobotState.INIT;
 
     // Arm and wrist target positions for each state
-   
+
 
     private static final double DISENGAGER_DISENGAGED_POSITION = 1.0;
     private static final double DISENGAGER_ENGAGED_POSITION = -1.0;
@@ -51,11 +51,11 @@ public class technotest extends LinearOpMode {
     private double Xcord = 0;
     private double Ycord = 0;
     private double Dcord = 0;
-    private double Order = 0;
+    private int Order = 0;
     private double Xps = 0;
     private double Yps = 0;
     private double Dps = 0;
-    private double Distance =0;
+    private double Distance = 0;
     private double Dswipswap = 0;
     private double point = 0;
     private final int READ_PERIOD = 1;
@@ -83,6 +83,7 @@ public class technotest extends LinearOpMode {
             SHOOTSPINDOWN,
 
         }
+
         private TechnoState myState = TechnoState.NEXT;
         private final Robott.TechnoState currentState = TechnoState.NEXT;
         public double autoForward = 0;
@@ -153,7 +154,7 @@ public class technotest extends LinearOpMode {
         void update() {
             odo.update();
             currentTime = System.currentTimeMillis() - startTime;
-            switch(myState) {
+            switch (myState) {
                 case MOVE:
                     autoForward = 1;
                     if (currentTime > targetTime) {
@@ -170,12 +171,12 @@ public class technotest extends LinearOpMode {
                     }
                     break;
                 case SHOOTSPIN:
-                    autoSpinBump= 2;
+                    autoSpinBump = 2;
                     myState = TechnoState.SHOOTSPINDOWN;
                     targetTime = currentTime + 500;
                     break;
                 case SHOOTSPINDOWN:
-                    autoSpinBump =0;
+                    autoSpinBump = 0;
                     if (currentTime > targetTime) {
                         autoOutput = 0;
                         autoFlick = false;
@@ -211,7 +212,6 @@ public class technotest extends LinearOpMode {
         }
 
 
-
         String getPositionString() {
             Pose2D pos = odo.getPosition();
             return String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}", pos.getX(DistanceUnit.CM), pos.getY(DistanceUnit.CM), pos.getHeading(AngleUnit.RADIANS));
@@ -219,18 +219,25 @@ public class technotest extends LinearOpMode {
         }
 
         String getVelocityString() {
-            return String.format(Locale.US,"{XVel: %.3f, YVel: %.3f, HVel: %.3f}", odo.getVelX(DistanceUnit.MM), odo.getVelY(DistanceUnit.MM), odo.getHeadingVelocity(UnnormalizedAngleUnit.DEGREES));
+            return String.format(Locale.US, "{XVel: %.3f, YVel: %.3f, HVel: %.3f}", odo.getVelX(DistanceUnit.MM), odo.getVelY(DistanceUnit.MM), odo.getHeadingVelocity(UnnormalizedAngleUnit.DEGREES));
 
         }
 
         Double getXcoord() {
-            Pose2D pos = odo.getPosition();
-            return pos.getX(DistanceUnit.CM);
+            //Pose2D pos = odo.getPosition();
+            //return pos.getX(DistanceUnit.CM);
+            if (currentTime < 500) {
+                return 10.0;
+            } else {
+                return 50.0;
+            }
         }
+
         Double getYcoord() {
             Pose2D pos = odo.getPosition();
             return pos.getY(DistanceUnit.CM);
         }
+
         Double getOrientation() {
             Pose2D pos = odo.getPosition();
             return pos.getHeading(AngleUnit.RADIANS);
@@ -249,7 +256,7 @@ public class technotest extends LinearOpMode {
         DcMotor Intake = hardwareMap.dcMotor.get("Intake");
         DcMotor Spool = hardwareMap.dcMotor.get("Spool");
         Servo Disengager = hardwareMap.get(Servo.class, "Disengager");
-        touchSensor =  hardwareMap.get(DigitalChannel.class, "Reingager");
+        touchSensor = hardwareMap.get(DigitalChannel.class, "Reingager");
         // Husky Hardware Mapping
         huskyLens = hardwareMap.get(HuskyLens.class, "huskylens");
 
@@ -273,7 +280,7 @@ public class technotest extends LinearOpMode {
         waitForStart();
         resetRuntime();
         Robott timer = new Robott();
-        timer.start(hardwareMap.get(GoBildaPinpointDriver.class,"odowheels"));
+        timer.start(hardwareMap.get(GoBildaPinpointDriver.class, "odowheels"));
 
 
         // run until the end of the match (driver presses STOP)
@@ -308,8 +315,8 @@ public class technotest extends LinearOpMode {
              */
             double counter = 1;
             double newTime = getRuntime();
-            double loopTime = newTime-oldTime;
-            double frequency = 1/loopTime;
+            double loopTime = newTime - oldTime;
+            double frequency = 1 / loopTime;
             double loaded = 1;
             double Autocenter = 0;
             oldTime = newTime;
@@ -393,8 +400,10 @@ public class technotest extends LinearOpMode {
 
             telemetry.addData("Velocity", timer.getVelocityString());
             telemetry.addData("Position", timer.getPositionString());
-            telemetry.addData("Point" , point);
-            telemetry.addData("Dswipswap" , Dswipswap);
+            telemetry.addData("Point", point);
+            telemetry.addData("Dswipswap", Dswipswap);
+            telemetry.addData("timer", timer.currentTime);
+            telemetry.addData("Order", Order);
             telemetry.update();
             /*
             gets the current Velocity (x & y in mm/sec and heading in degrees/sec) and prints it.
@@ -422,90 +431,79 @@ public class technotest extends LinearOpMode {
 //            }
 
 
-
-            double Speed = (Distance/10);
+            timer.update();
+            double Speed = (Distance / 10);
 
             double Xdif = (Xps - Xcord);
             double Ydif = (Yps - Ycord);
             Dps = Math.atan2(Xdif, Ydif);
             double Ddif = (Dps - Dcord);
-            double Dspeed = (Math.abs(Dps - Dcord)/5);
+            double Dspeed = (Math.abs(Dps - Dcord) / 5);
 
-            Distance = (Math.sqrt((Math.pow((Xdif),2)) + (Math.pow((Ydif),2))));
-
+            Distance = (Math.sqrt((Math.pow((Xdif), 2)) + (Math.pow((Ydif), 2))));
 
             if (Ddif < -0.05) {
                 Dswipswap = 1;
-            }
-            else if (Ddif > 0.05){
+            } else if (Ddif > 0.05) {
                 Dswipswap = 0;
             } else {
                 Dswipswap = 2;
             }
 
             if (Dswipswap == 0) {
-               timer.autoTurn = (Dspeed * -1);
-               point = 0;
+                timer.autoTurn = (Dspeed * -1);
+                point = 0;
             } else if (Dswipswap == 1) {
                 timer.autoTurn = Dspeed;
-                point = 0;
-            } else {
-                point = 1;
+                if (Distance >= 20) {
+                    timer.autoForward = Speed / 2;
+                } else if (Distance <= -20) {
+                    timer.autoForward = -Speed / 2;
+                } else {
+                    timer.autoForward = 0;
+                }
             }
-
-            if (Distance >= 20 && point == 1) {
-                timer.autoForward = Speed;
-            } else if (Distance <= -20 && point == 1) {
-                timer.autoForward = -Speed;
-            } else {
-                timer.autoForward = 0;
-            }
-
-
 
                 if (Xcord == Xps && Ycord == Yps) {
-                Order += 1;
+                    Order += 1;
                 }
 
 
-
-            waitForStart();
-            Yps = 0;
-            Xps = 0;
-            if (Order == 1) {
+                waitForStart();
+                Yps = 0;
                 Xps = 50;
+                if (Order == 1) {
+                    Xps = 50;
+                }
+
+
+                //allows a wait before you can press the button again
+
+                spinpos = (spinpos + timer.autoSpinBump);
+
+
+                timer.update();
+
+                // --- Manual arm control with d-pad ---
+                targetOutake = timer.autoOutput;
+
+                targetIntake = timer.autoInput;
+
+
+                // --- Drive control ---
+                double forward = timer.autoForward;
+                double strafe = timer.autoStrafe;
+                double turn = timer.autoTurn;
+                boolean flick = timer.autoFlick;
+
+                double denominator = Math.max(Math.abs(forward) + Math.abs(strafe) + Math.abs(turn), 1);
+
+                Leftfw.setPower((forward + strafe + turn) / denominator);
+                Leftbw.setPower((forward - strafe + turn) / denominator);
+                Rightfw.setPower((forward - strafe - turn) / denominator);
+                Rightbw.setPower((forward + strafe - turn) / denominator);
+
+
             }
-
-            
-            //allows a wait before you can press the button again
-
-            spinpos = (spinpos + timer.autoSpinBump) ;
-
-
-
-            timer.update();
-
-            // --- Manual arm control with d-pad ---
-            targetOutake = timer.autoOutput;
-
-            targetIntake = timer.autoInput;
-
-
-
-            // --- Drive control ---
-            double forward = timer.autoForward;
-            double strafe = timer.autoStrafe;
-            double turn = timer.autoTurn;
-            boolean flick = timer.autoFlick;
-
-            double denominator = Math.max(Math.abs(forward) + Math.abs(strafe) + Math.abs(turn), 1);
-
-            Leftfw.setPower((forward + strafe + turn) / denominator);
-            Leftbw.setPower((forward - strafe + turn) / denominator);
-            Rightfw.setPower((forward - strafe - turn) / denominator);
-            Rightbw.setPower((forward + strafe - turn) / denominator);
-
-
         }
     }
-}
