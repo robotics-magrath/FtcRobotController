@@ -444,9 +444,11 @@ public class technotest extends LinearOpMode {
             }
 
             if (Dswipswap == 0) {
+               timer.update();
                timer.autoTurn = (Dspeed * -1);
                point = 0;
             } else if (Dswipswap == 1) {
+                timer.update();
                 timer.autoTurn = Dspeed;
                 point = 0;
             } else {
